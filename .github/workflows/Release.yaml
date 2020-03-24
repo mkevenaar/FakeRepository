@@ -9,7 +9,9 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/release')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
 
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
@@ -17,30 +19,29 @@ jobs:
       - name: Zip Release
         run: zip -x '*.git*' -r release.zip . 
 
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9
-        with:
-            versionSpec: '5.2.x'
-
-      - uses: gittools/actions/gitversion/execute@v0.9
-        name: Use GitVersion
-        id: gitversion
-        
-
-      - uses: jungwinter/split@v1
-        name: Extract owner and repo
+      - name: Extract owner and repo
+        uses: jungwinter/split@v1
         id: repo
         with:
           seperator: '/'
           msg: ${{ github.repository }}
 
-      - uses: gittools/actions/gitreleasemanager/setup@v0.9
-        name: Install GitReleaseManager
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9
+        with:
+            versionSpec: '5.x'
+
+      - name: Use GitVersion
+        uses: gittools/actions/gitversion/execute@v0.9
+        id: gitversion
+        
+      - name: Install GitReleaseManager
+        uses: gittools/actions/gitreleasemanager/setup@v0.9
         with:
           versionSpec: '0.11.x'
 
-      - uses: gittools/actions/gitreleasemanager/create@v0.9
-        name: Create release with GitReleaseManager
+      - name: Create release with GitReleaseManager
+        uses: gittools/actions/gitreleasemanager/create@v0.9
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           owner: ${{ steps.repo.split.outputs._1 }}
@@ -50,8 +51,8 @@ jobs:
           assets:  |
             release.zip
 
-      - uses: gittools/actions/gitreleasemanager/publish@v0.9
-        name: Publish release with GitReleaseManager
+      - name: Publish release with GitReleaseManager
+        uses: gittools/actions/gitreleasemanager/publish@v0.9
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           owner: ${{ steps.repo.split.outputs._1 }}
