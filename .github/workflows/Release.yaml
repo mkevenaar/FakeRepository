@@ -9,7 +9,7 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/release')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
@@ -32,7 +32,7 @@ jobs:
         id: repo
         with:
           seperator: '/'
-          msg: ${{ GITHUB_REPOSITORY }}
+          msg: ${{ github.repository }}
 
       - uses: gittools/actions/gitreleasemanager/setup@v0.9
         name: Install GitReleaseManager
