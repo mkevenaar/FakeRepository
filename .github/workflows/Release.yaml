@@ -1,0 +1,59 @@
+---
+
+name: Release
+on: [push]
+
+jobs:
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/heads/release')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
+
+      - name: Zip Release
+        run: zip -x '*.git*' -r release.zip . 
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9
+        with:
+            versionSpec: '5.2.x'
+
+      - uses: gittools/actions/gitversion/execute@v0.9
+        name: Use GitVersion
+        id: gitversion
+        
+
+      - uses: jungwinter/split@v1
+        name: Extract owner and repo
+        id: repo
+        with:
+          seperator: '/'
+          msg: ${{ GITHUB_REPOSITORY }}
+
+      - uses: gittools/actions/gitreleasemanager/setup@v0.9
+        name: Install GitReleaseManager
+        with:
+          versionSpec: '0.11.x'
+
+      - uses: gittools/actions/gitreleasemanager/create@v0.9
+        name: Create release with GitReleaseManager
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ steps.repo.split.outputs._1 }}
+          repository: ${{ steps.repo.split.outputs._2 }}
+          milestone: ${{ steps.gitversion.outputs.majorMinorPatch }}
+          name: 'Release ${{ steps.gitversion.outputs.majorMinorPatch }}'
+          assets:  |
+            release.zip
+
+      - uses: gittools/actions/gitreleasemanager/publish@v0.9
+        name: Publish release with GitReleaseManager
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ steps.repo.split.outputs._1 }}
+          repository: ${{ steps.repo.split.outputs._2 }}
+          tagName: ${{ steps.gitversion.outputs.majorMinorPatch }}
