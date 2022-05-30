@@ -1,0 +1,10 @@
+**/*.min.js
+**/*.min.css
+
+.idea/
+node_modules/
+dist/
+build/
+
+# Ignore all md files:
+*.md
