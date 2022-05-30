@@ -19,13 +19,13 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: Zip Release
-        run: zip -x '*.git*' -r release.zip . 
+        run: zip -x '*.git*' -r release.zip .
 
       - name: Extract owner and repo
         uses: jungwinter/split@v2.0.0
         id: repo
         with:
-          seperator: '/'
+          separator: '/'
           msg: ${{ github.repository }}
 
       - name: Install GitVersion
