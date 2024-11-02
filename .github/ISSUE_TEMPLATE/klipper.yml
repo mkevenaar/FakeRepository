@@ -1,5 +1,5 @@
 name: Klipper beta bug report
-about: Beta klipper issue report
+description: Beta klipper issue report
 title: "[Klipper]: "
 labels: ["klipper", "triage"]
 assignees: 
